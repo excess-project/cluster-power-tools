@@ -1,0 +1,50 @@
+# This makefile is for "local" compilation, that is compiling a driver without using the standard Linux way (make Xconfig etc...)
+# Anyway to compile this driver you need to have a already configured Linux kernel source tree
+
+# This makefile allows to build the driver outside the kernel
+# you need then to specify where are located the kernel source the includes used by this driver
+
+# Notes:
+# * the source of these drivers are generally located in the kernel source directory
+# in the path $(TOPDIR)/drivers/addidata/
+# * the the ADDI-DATA specific includes are generally located in the kernel source directory
+# in the path $(TOPDIR)/include/linux/addidata
+
+####################################################################
+# relative path of the source of the kernel to build against
+# IF YOU ARE BUILDING THIS DRIVER OUTSIDE THE KERNEL SOURCE
+# PLEASE ADAPT THIS VARIABLE TO YOUR LOCAL INSTALLATION 
+KERNELSRCDIR:=/usr/src/linux/
+####################################################################
+
+
+####################################################################
+# relative path of the addidata include directory
+# IF YOU ARE BUILDING THIS DRIVER OUTSIDE THE KERNEL SOURCE
+# PLEASE ADAPT THIS VARIABLE TO YOUR LOCAL INSTALLATION 
+ADDIDATAINC:=/usr/src/linux/include/linux/addidata/
+####################################################################
+
+# make -f _makefile 2.4 or 2.6
+all: 
+	@echo "use the upper _makefile to build these modules"
+
+# make -f _makefile clean
+clean: localclean
+
+localclean:	
+	- find . -name '*.o' -exec rm {} \;
+	- find . -name '*.ko' -exec rm {} \;
+	- find . -name '*.o.flags' -exec rm {} \;
+	- find . -name '.depend' -exec rm {} \;
+	- find . -name '*~' -exec rm {} \;
+	- find . -name '*.mod.o' -exec rm {} \;
+	- find . -name '*.o.cmd' -exec rm {} \;
+	- find . -name '*.ko.cmd' -exec rm {} \;
+	- find . -name '*.mod.c' -exec rm {} \;
+	- find . -name '*.o.d' -exec rm {} \;
+	- find . -name '*.symvers' -exec rm {} \;
+	- find . -name '.tmp_versions' -exec rm -Rf {} \;
+	- find . -name 'Module.markers' -exec rm -Rf {} \;
+	- find . -name 'modules.order' -exec rm -Rf {} \;
+

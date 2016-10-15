@@ -1,0 +1,179 @@
+# This makefile is for "local" compilation, that is compiling a driver without using the standard Linux way (make Xconfig etc...)
+# Anyway to compile this driver you need to have a already configured Linux kernel source tree
+
+# This makefile allows to build the driver outside the kernel
+# you need then to specify where are located the kernel source the includes used by this driver
+
+# Notes:
+# * the source of these drivers are generally located in the kernel source directory
+# in the path $(TOPDIR)/drivers/addidata/
+# * the the ADDI-DATA specific includes are generally located in the kernel source directory
+# in the path $(TOPDIR)/include/linux/addidata
+
+####################################################################
+# relative path of the source of the kernel to build against
+# IF YOU ARE BUILDING THIS DRIVER OUTSIDE THE KERNEL SOURCE
+# PLEASE ADAPT THIS VARIABLE TO YOUR LOCAL INSTALLATION 
+ifeq ($(KERNELSRCDIR),)
+KERNELSRCDIR:=/usr/src/linux/
+endif
+####################################################################
+
+
+####################################################################
+# relative path of the addidata include directory
+# IF YOU ARE BUILDING THIS DRIVER OUTSIDE THE KERNEL SOURCE
+# PLEASE ADAPT THIS VARIABLE TO YOUR LOCAL INSTALLATION 
+ifeq ($(ADDIDATAINC),)
+ADDIDATAINC:=/usr/src/linux/include/linux/addidata/
+endif
+####################################################################
+
+####################################################################
+# name of the file that contains symbol informations
+# for Linux up to 2.6.16 = Modules.symvers
+# from 2.6.16 on = Module.symvers
+SYMVERFILE:=Module.symvers
+####################################################################
+
+# make -f _makefile 2.4 or 2.6
+all: 
+	@echo "please choose either 2.4 or 2.6 (e.g.: make -f _makefile 2.4 or make -f _makefile 2.4_nodma)"
+
+2.4_nodma: checkconfig .depend xpci3xxx_no_DMA.o
+2.4: checkconfig .depend xpci3xxx.o
+
+2.6_nodma: checkconfig xpci3xxx_no_DMA.ko
+2.6: checkconfig xpci3xxx.ko
+
+.PHONY: checkconfig .depend samples tests dist
+
+# make -f _makefile clean
+clean: localclean
+
+localclean:	
+	-cd tests && make clean
+	-cd samples && make clean
+	-cd ksamples && make -f _makefile clean	
+	- rm -rf ./doc
+	- find . -name '*.o' -exec rm {} \;
+	- find . -name '*.ko' -exec rm {} \;
+	- find . -name '*.o.flags' -exec rm {} \;
+	- find . -name '.depend' -exec rm {} \;
+	- find . -name '*~' -exec rm {} \;
+	- find . -name '*.mod.o' -exec rm {} \;
+	- find . -name '*.o.cmd' -exec rm {} \;
+	- find . -name '*.ko.cmd' -exec rm {} \;
+	- find . -name '*.mod.c' -exec rm {} \;
+	- find . -name '*.o.d' -exec rm {} \;
+	- find . -name '*.symvers' -exec rm {} \;
+	
+checkconfig:
+	@if [ ! -e $(KERNELSRCDIR)/.config  ]; \
+	then echo ".config \
+	* Is your kernel configured (make xconfig)? \
+	* Did you correctly adapt _makefile ?"; \
+	echo "KERNELSRCDIR="$(KERNELSRCDIR);\
+	echo "ADDIDATAINC="$(ADDIDATAINC);\
+	exit 1; fi
+
+
+# check for the sparse static code checker
+sparse_path:=$(shell which sparse)
+
+ifneq ($(sparse_path),)
+$(info info: sparse found as "$(sparse_path)": activating static checking for driver code while compiling for Linux 2.6 )
+SPARSE_FLAGS:="C=1"
+endif
+
+# call the kernel's build process to actually build our stuff
+xpci3xxx.o:
+	echo "//#define CONFIG_XPCI3XXX_NO_DMA			1" > xpci3xxx-options.h; \
+	echo "//#define USE_ADDIEEPROM	1" >> xpci3xxx-options.h; \
+	$(MAKE)  SUBDIRS=$(shell pwd) CONFIG_XPCI3XXX_IOCTL=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+	
+xpci3xxx_no_DMA.o:
+	echo "!!! DMA not used"; \
+	echo "#define CONFIG_XPCI3XXX_NO_DMA 		1" > xpci3xxx-options.h; \
+	echo "//#define USE_ADDIEEPROM	1" >> xpci3xxx-options.h; \
+	$(MAKE)   SUBDIRS=$(shell pwd) CONFIG_XPCI3XXX_IOCTL=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+
+xpci3xxx.ko:
+	echo "//#define CONFIG_XPCI3XXX_NO_DMA			1" > xpci3xxx-options.h; \
+	echo "//#define USE_ADDIEEPROM	1" >> xpci3xxx-options.h; \
+	$(MAKE) $(SPARSE_FLAGS) SUBDIRS=$(shell pwd) CONFIG_XPCI3XXX_IOCTL=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+	
+xpci3xxx_no_DMA.ko:
+	echo "!!! DMA not used"; \
+	echo "#define CONFIG_XPCI3XXX_NO_DMA 		1" > xpci3xxx-options.h; \
+	echo "//#define USE_ADDIEEPROM	1" >> xpci3xxx-options.h; \
+	$(MAKE) $(SPARSE_FLAGS) SUBDIRS=$(shell pwd) CONFIG_XPCI3XXX_IOCTL=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+
+.depend:
+	$(MAKE)   SUBDIRS=$(shell pwd) CONFIG_XPCI3XXX_IOCTL=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) dep
+
+install_24: xpci3xxx.o
+	$(MAKE)   SUBDIRS=$(shell pwd) CONFIG_XPCI3XXX_IOCTL=m  -C $(KERNELSRCDIR) modules_install
+
+install_26: xpci3xxx.o
+	$(MAKE)   SUBDIRS=$(shell pwd) CONFIG_XPCI3XXX_IOCTL=m  -C $(KERNELSRCDIR) modules_install
+	# Install the udev rules for this driver
+	./mkudevrules.sh
+
+ksamples_24: ksamples/ksample01.o ksamples/ksample02.o ksamples/ksample03.o ksamples/ksample04.o ksamples/ksample05.o
+ksamples_26: ksamples/ksample01.ko ksamples/ksample02.ko ksamples/ksample03.ko ksamples/ksample04.ko ksamples/ksample05.ko
+
+ksamples/$(SYMVERFILE): $(SYMVERFILE)
+	-cp $(SYMVERFILE) ksamples/$(SYMVERFILE)
+	
+#.PHONY: Module.symvers
+
+# call the kernel's build process to actually build our stuff
+ksamples/ksample01.o:
+	$(MAKE) SUBDIRS=$(shell pwd)/ksamples CONFIG_SAMPLE01=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+
+ksamples/ksample02.o:
+	$(MAKE)  SUBDIRS=$(shell pwd)/ksamples CONFIG_SAMPLE02=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+	
+ksamples/ksample03.o:
+	$(MAKE)  SUBDIRS=$(shell pwd)/ksamples CONFIG_SAMPLE03=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules	
+
+ksamples/ksample04.o:
+	$(MAKE)  SUBDIRS=$(shell pwd)/ksamples CONFIG_SAMPLE04=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules	
+
+ksamples/ksample05.o:
+	$(MAKE)  SUBDIRS=$(shell pwd)/ksamples CONFIG_SAMPLE05=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules	
+	
+ksamples/ksample01.ko: ksamples/$(SYMVERFILE)
+	$(MAKE) $(SPARSE_FLAGS) SUBDIRS=$(shell pwd)/ksamples CONFIG_SAMPLE01=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+
+ksamples/ksample02.ko: ksamples/$(SYMVERFILE)
+	$(MAKE) $(SPARSE_FLAGS) SUBDIRS=$(shell pwd)/ksamples CONFIG_SAMPLE02=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+	
+ksamples/ksample03.ko: ksamples/$(SYMVERFILE)
+	$(MAKE) $(SPARSE_FLAGS) SUBDIRS=$(shell pwd)/ksamples CONFIG_SAMPLE03=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+
+ksamples/ksample04.ko: ksamples/$(SYMVERFILE)
+	$(MAKE) $(SPARSE_FLAGS) SUBDIRS=$(shell pwd)/ksamples CONFIG_SAMPLE04=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+
+ksamples/ksample05.ko: ksamples/$(SYMVERFILE)
+	$(MAKE) $(SPARSE_FLAGS) SUBDIRS=$(shell pwd)/ksamples CONFIG_SAMPLE05=m  ADDIDATAINC=$(ADDIDATAINC) -C $(KERNELSRCDIR) modules
+
+# Example of how to compile the test apps
+tests:
+	cd tests && ADDIDATAINC=$(ADDIDATAINC) make  all
+
+samples:
+	cd samples && ADDIDATAINC=$(ADDIDATAINC) make all
+
+# generates driver's package
+
+ifeq ($(ARCHIVE_DIR),)
+ARCHIVE_DIR:=/tmp
+endif
+
+dist: localclean doc
+	../makedistrib xpci3xxx ./ ./dist/srcfiles $(ADDIDATAINC)/ ./dist/headers $(ARCHIVE_DIR)
+
+doc: Doxyfile
+	doxygen Doxyfile

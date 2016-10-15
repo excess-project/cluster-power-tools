@@ -1,0 +1,17 @@
+To enjoy all the benefits of the power tools and avoid
+unnecessary complications, use a Linux distribution
+for x86 with the kernel 2.6.32. The server in HLRS
+uses "Scientific Linux release 6.6 (Carbon)" with the
+kernel 2.6.32-431. The kernel must be patched with
+Bigphysarea Patch. This is necessary to ensure that
+you can uninterruptible  measure the power consumption
+of the cluster components for several hours.
+Consalt the instruction in readme_patch.txt to patch the kernel.
+There will always be some variations in detail. For example,
+the grub command line must be expanded with the parameter
+bigphysarea=262144 in /boot/grub/grub.conf and not in
+in /etc/lilo.conf. The number 262144 defined the number
+of pages in the memory, which will be used by the
+A/D converter APCIe-3021 to save the measure values
+using DMA.
+

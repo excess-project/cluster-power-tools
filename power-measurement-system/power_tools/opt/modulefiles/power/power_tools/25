@@ -1,0 +1,28 @@
+#%Module
+#
+# Power tools for raw_data version 25
+# khabi @03.08.2015
+
+set  version    "25"
+set  base_dir   "/opt/power/power_tools/"
+#Use right compiler (with this compiler the tools must be compiled)
+module load compiler/gnu/4.9.2
+
+prepend-path  PATH  $base_dir/$version/bin
+setenv PW_TOOLS_PATH $base_dir/$version
+setenv PW_TOOLS_DOC_PATH $base_dir/$version/doc
+
+# -----------------------------------------------------------------
+setenv        LC_MESSAGES      en_US.UTF-8
+setenv        LC_COLLATE       en_US.UTF-8
+setenv        LC_CTYPE         en_US.UTF-8
+# --------------------------------------------------------------------
+module-whatis "Power tools module: $version"
+# --------------------------------------------------------------------
+
+proc ModulesHelp { } {
+        global version
+
+        puts stderr "\n\tVersion $version\n"
+}
+

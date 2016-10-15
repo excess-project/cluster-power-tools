@@ -1,0 +1,2 @@
+//#define CONFIG_XPCI3XXX_NO_DMA			1
+//#define USE_ADDIEEPROM	1

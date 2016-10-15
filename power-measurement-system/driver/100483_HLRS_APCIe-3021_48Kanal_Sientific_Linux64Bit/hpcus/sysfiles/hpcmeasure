@@ -1,0 +1,101 @@
+#!/bin/sh
+#
+#
+#
+#
+# 
+# Control the power measurement of ${NODE}
+# description:  
+# Start: start hpc_measure withn config_${NODE}.ini & start hpc_converter on ${POWER_FILE_PATH}
+# save the process ids in ${POWER_FILE_PATH}/covert_${NODE}.pid and ${POWER_FILE_PATH}/measure_${NODE}.pid
+# Stop: read process ids and stop the power measurement
+#
+### BEGIN INIT INFO
+# Provides:
+# Required-Start:
+# Required-Stop:
+# Default-Start: 5
+# Default-Stop: 5
+# Short-Description: start and stop
+# Description: power measurement on ${NODE}
+### END INIT INFO
+export PBS_USER=$2
+export PBS_JOBID=$3
+export DBKEY=$4
+export NODE=$5
+export PROFILE_ID=$6
+export SAVE_POWER_DATA=$7
+export PBS_JOBNAME=$8
+export RETVAL=0
+export HPC_REVISION=$(cat /opt/power/hpcmeasure/revision)
+export HPCMEASURE_PATH=/opt/power/hpcmeasure/${HPC_REVISION}/
+export HPC_ADDI_SCRIPT=$HPCMEASURE_PATH/start_hpcmeasure_addi.sh
+export HPC_COMP_SCRIPT=$HPCMEASURE_PATH/start_hpcmeasure_compnode.sh
+export HPC_ADDI_STOP_SCRIPT=$HPCMEASURE_PATH/stop_hpcmeasure_addi.sh
+export HPC_COMP_STOP_SCRIPT=$HPCMEASURE_PATH/stop_hpcmeasure_compnode.sh
+export POWER_FILE_PATH=/ext/${NODE}/
+export RAW_FILE_PATH=/raw_data/${NODE}/
+export MEASURE_BIN=$HPCMEASURE_PATH/bin/hpc_measure
+export CONVERT_BIN=$HPCMEASURE_PATH/bin/hpc_convert
+export PROC_MEASURE_PIDFILE=${POWER_FILE_PATH}/measure_${NODE}.pid
+export PROC_CONVERT_PIDFILE=${POWER_FILE_PATH}/covert_${NODE}.pid
+export LOCK_FILE=/ext/${NODE}/hpcm.lock
+export LOG_FILE=/var/log/hpcmeasure/hpcmeasure_service_${NODE}.log
+
+export DATE="$( date +'%c'  )"
+
+if [ -z "$PROFILE_ID" ]; then
+   PROFILE_ID=-1
+fi
+
+start()
+{
+       if [ -z "$NODE" ]; then
+         echo $DATE:"Error in service hpcmeasure stra()">>$LOG_FILE
+         RETVAL=-3
+         exit -3
+       fi
+       LOG_FILE=/var/log/hpcmeasure/addi_hpcmeasure_service_start_${NODE}.log
+       if [ -f "$LOCK_FILE" ]; then
+         echo $DATE":power measure of ${NODE} is locked with $LOCK_FILE" >> $LOG_FILE
+         RETVAL=-1
+         exit $RETVAL
+       fi
+       echo $DATE":Start power measure of ${NODE} profile_id: ${PROFILE_ID}" >> $LOG_FILE
+       echo "parameters: ${DBKEY} ${NODE} ${PROFILE_ID} ${SAVE_POWER_DATA} ${PBS_USER} ${PBS_JOBNAME}" >> $LOG_FILE
+       ${HPC_ADDI_SCRIPT}   ${DBKEY} ${NODE} ${PROFILE_ID} ${SAVE_POWER_DATA} ${PBS_USER}  ${PBS_JOBNAME} >> $LOG_FILE
+       touch $LOCK_FILE
+}
+
+stop()
+{ 
+        if [ -z "$NODE" ]; then
+          echo $DATE:"Error in service hpcmeasure stop()">>$LOG_FILE
+          RETVAL=-4
+          exit -4
+        fi
+        LOG_FILE=/var/log/hpcmeasure/addi_hpcmeasure_service_stop_${NODE}.log
+	echo $DATE":Service to stop power measure of NODE=${NODE} DBKEY=${DBKEY}" >> $LOG_FILE
+        if [ ! -f "$LOCK_FILE" ]; then
+          RETVAL=-12
+          echo $DATE":power measure of ${NODE} was not started ( no lock file $LOCK_FILE)" >> $LOG_FILE
+	  exit $RETVAL
+        fi
+	${HPC_ADDI_STOP_SCRIPT} ${PBS_USER} ${PBS_JOBID} ${DBKEY} ${NODE} ${PROFILE_ID} ${SAVE_POWER_DATA} >> $LOG_FILE
+        rm $LOCK_FILE -rf
+}
+
+
+case "$1" in
+        start)
+                start
+                ;;
+        stop)
+                stop
+
+                ;;
+        *)
+                ;;
+esac
+exit $RETVAL
+

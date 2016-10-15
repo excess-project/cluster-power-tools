@@ -1,0 +1,61 @@
+#!/bin/sh
+#!/bin/sh
+#
+# Allow  to the users to start addi a/d converter
+#
+# chkconfig: - 23 84
+# description:  change rights of addi  devices
+#
+# processname: mystartup
+# pidfile: /var/run/mystartupr.pid
+#
+### BEGIN INIT INFO
+# Provides:
+# Required-Start:
+# Required-Stop:
+# Default-Start: 5
+# Default-Stop: 5
+# Short-Description: start and stop
+# Description: allow to user the ADDI devices
+### END INIT INFO
+
+
+
+RETVAL=0
+
+start()
+{
+ 	echo "allow to start addi"
+	chmod --preserve-root --recursive 666 /dev/xpci3xxx/
+	chmod --preserve-root --recursive 666 /dev/xpci3xxx/0
+	chmod --preserve-root --recursive 666 /dev/xpci3xxx/1
+	chmod --preserve-root --recursive 666 /dev/xpci3xxx/2
+	chmod --preserve-root --recursive 666 /dev/xpci3xxx/3
+	chmod --preserve-root 777 /dev/xpci3xxx
+}
+
+stop()
+{
+ 	echo "don't allow to start addi"
+	chmod --preserve-root --recursive 644 /dev/xpci3xxx/
+	chmod --preserve-root  664 /dev/xpci3xxx/0
+	chmod --preserve-root  664 /dev/xpci3xxx/1
+	chmod --preserve-root  664 /dev/xpci3xxx/2
+	chmod --preserve-root  664 /dev/xpci3xxx/3
+
+}
+
+
+case "$1" in
+        start)
+                start
+                ;;
+        stop)
+                stop
+
+		;;
+	*)
+                ;;
+esac
+exit $RETVAL
+
