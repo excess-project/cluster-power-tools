@@ -28,7 +28,7 @@ High Performance Computing Center Stuttgart (HLRS)
 The power measurement system is a linux server equiped
 with one or several A/D converters in the form of a PCIe 
 card. In our system we use four cards ACPIe-3021 of the
-company ADDI-DATA GmbH. The document ./datenblatt_apcie-3021.pdf
+company ADDI-DATA GmbH. The document ./data_sheet_apcie-3021.pdf
 contains a description of the card. To use other A/D converters,
 the drivers (see ../driver/Readme.txt) must be extended
 with the new functionality to control the cards in compatible way.
