@@ -79,21 +79,21 @@ Make produces three executable:
 -hpc_convert: This process read the raw files and con-
  vert the measured values in the appropriate metrics.
  The appropriate conversion will be made on the basis 
- of configuration files.
+ of the configuration files.
 -hpc_update: This tool can update APCIe-3021 with the
  new firmware image APCIe3121_US11.rbf. This update
- corrects the bug, which caused the spontaneous error
+ corrects a bug, which caused the spontaneous error
  during the measurement. You don't need to use it, if
  you order the A/D converters with the HLRS Firmware 
  update. 
 
 ======================================================
    How to flash the firmware update to APCIe-3021 
-      (you don't need to doi if you ordered
+      (you don't need to do it if you ordered
     APCIe-3021 with the HLRS firmware update)
 ======================================================
 Go to the sub-directory 100483_HLRS_/hpcus/hpc and 
-run the follo- wing actions
+run the following actions
 1 - Reboot the system
 2 - Check all installed APCIe-3021 devices:
 $ls /dev/dev/xpci3xxx_*
@@ -119,11 +119,10 @@ hpc_measure:
   has eight analog channels. This process configures and records each
   of the channels of several APCIe-3021s cards. Currently, its support
   four cards. If you install more or less ACPIe-3012 change its
-  number in the header hpc.h. The can start several process parallel,
-  each for one of cards. 
-  Consider, that it is not allowed
-  to record the same card simultaneously from different processes (At least
-  not tested). The configure file is divided in the GLOBAL part and in 
+  number in the header hpc.h. You may start several process parallel,
+  each for one of cards.  Consider, that it is not allowed
+  to manage and record the same card simultaneously from different processes.
+  The configure file is divided in the GLOBAL part and in 
   the channel definition parts for each of the installed card.
   The frequency of the A/D converter is 100kHz, which is shared between the
   eight channels. The frequency can be changed in the field
@@ -151,7 +150,7 @@ hpc_measure:
   the   maximal voltage on the input, chooce the appropriate gain in the field
   "channel_0_gain": 10 is for the voltage range [0;1] (V) in Bipolar mode and [-1;1] (V) in
   Polar mode.
-  The channel coefficients  are defined in the configuration file. For
+  The channel coefficients  are also defined in the configuration files. For
   example see ../profiles/config_node02.ini.
 
 hpc_converter:
