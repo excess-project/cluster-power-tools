@@ -33,18 +33,19 @@ High Performance Computing Center Stuttgart (HLRS)
 =======================================================
 -How to configurate the cluster for the power tools.
 =======================================================
-We show the configuration of the cluster on the base
-of EXCESS clsuter. This Cluster is a heterogenous computing
+We show the configuration of a computer cluster on the base
+of the EXCESS clsuter. The cluster is a heterogenous computing
 platform of 3 compute nodes: node01, node02 and node03. 
 Cluster power tools enable monitoring of real-time power consumption
-of various EXCESS cluster components.
+of various hardware components.
 A TORQUE PBS Manager is installed on the Front-End server (FE)
 and manage the access to the computational resources node01-node03.
-FE, power measurement system (see top directory OS for the definition)
+Front-End and power measurement server (see top directory OS for the definition)
 have shared folder /opt, which is used to save under others the
 cluster power tools configuration. The folder /opt/power/hpcmeasure/
-contains various revision of the tools. The current version is
-saved in the file /opt/power/hpcmeasure/revision.
+contains various revisions of the tools. The current version number is
+saved into the file /opt/power/hpcmeasure/revision 
+(The version number is equal to the name of the revision's subdirectory.).
 The following files are defined in the directory
 -start_hpcmeasure_compnode.sh: This script will be called from
   the /var/spool/torque/mom_priv/prologue file, which must be
