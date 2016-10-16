@@ -16,11 +16,10 @@ High Performance Computing Center Stuttgart (HLRS)
  without even the implied warranty  of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE. 
 =======================================================
-This package  provides  functionality  of high-resolution 
-profiling and analysis of power consumption in a computer
-cluster. See  ./power-measurement-system/Readme.txt   for
-the details.
-
+This package  provides description, functionality and
+services of high-resolution profiling and analysis 
+of power consumption in a computer cluster. 
+See ./power-measurement-system/Readme.txt for the details.
 ======================================================
 
 ======================================================
