@@ -34,23 +34,31 @@ uses "Scientific  Linux release 6.6 (Carbon)"  with the
 kernel  2.6.32-431. The  kernel  must  be patched  with
 Bigphysarea Patch. This is necessary to ensure that you
 can  uninterruptible measure  the power  consumption of
-the  cluster  components  for  several  hours.  Consalt
-the  instruction  in   readme_patch.txt  to  patch  the
-kernel.  There  will  always   be  some  variations  in
+the cluster components for  several hours or even  days
+with a high measure frequency between 12.5  and 100 kHz.
+Consalt the instructions in readme_patch.txt  to  patch
+the kernel.  There will  always be  some variations  in
 detail.  For example,  the  grub command  line must  be
 expanded  with  the   parameter  bigphysarea=262144  in
-/boot/grub/grub.conf and not  in in /etc/lilo.conf. The                                                                                     
-number  262144  defined  the  number of  pages  in  the                                                                                     
-memory,  which  will  be  used  by  the  A/D  converter                                                                                     
+/boot/grub/grub.conf and not  in /etc/lilo.conf. The                                                                           
+number  262144  defines   the  number of  pages  in the
+memory,  which  will  be  used  by  the  A/D converters
 APCIe-3021 to save the measure values using DMA.
 
 
 After the installation of the operating system, install
 the packages, which are listed in the file 
-"installed-software.log". To install everything from the
+"installed-software.log", even if a major part of the
+packages are optional. To install everything from the
 list, use the command:
 $yum -y install $(cat installed-software.log)
-
+Turn off automatic updating using one new line in the file
+/etc/yum.conf:
+exclude=kernel.x86_64 kernel-debug.x86_64 \
+kernel-debug-devel.x86_64 \
+kernel-devel.x86_64 kernel-doc.noarch \
+kernel-firmware.noarch \
+kernel-headers.x86_64
 
 This sub-directory contains:
 - Readme.txt: You are reading it;
