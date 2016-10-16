@@ -35,7 +35,7 @@ High Performance Computing Center Stuttgart (HLRS)
  (see ../driver/Readme.txt about hpc_converter) 
 =======================================================
 This package contains the tools to calculate the power 
-consumption during a certain periode, to filter the
+consumption during a certain period of time ,to filter the
 measured values, to concatenate the measured values,
 which are stored in the sequencies of the files. 
 =======================================================
@@ -44,17 +44,17 @@ which are stored in the sequencies of the files.
 Choose a fortran compiler in Makefile. For example,
 use gfortan of the GNU version 4.9.2 or later.
 Set the path for the libhpcpower.a. We use this library 
-to read the config #file, which also used by hpc_converter
+to read a configuration file, which is also used by hpc_converter
 (See ../driver/Readme.txt about hpc_converter).
-The packages curl and ini_config must be also installes.
-Call make.
+The packages curl and ini_config must be also installed.
+Call the copmmand make to produce the tools.
 
 ===============Installing=============================
 If you user Modules -- Software Environment Management
 use the the module definition in the subdirectory ./opt
-and copy into the proper directory.
-copy the files to the directory, which is defined in 
-module (under ./opt/..):
+and copy into the proper directory. After that,
+copy the following files to the subdirectory, which is defined in 
+the module definition (under ./opt/..):
 power_average - applies the median or mean filter on 
      measured values;
 power_calculate - This tool helps to calculate a power consumption of various
@@ -62,12 +62,16 @@ power_calculate - This tool helps to calculate a power consumption of various
 power_calculate_avx -This tool helps to calculate a power consumption of
      various components for a certain period of time with the extention
      for the benchmark AVX (see (http://gitlab.excess-project.eu/benchmarks/avx-performance-benchmark)
+If you don't use Software Environment Management copy the above files
+to any directory and add the path of it to the environment variable PATH.
+
 
 ==============How to use==============================
-If you use the command "module load power/power_tools" loads the 
-last version of the tools: module load power/power-tools
 
-===================Power Average======================
+If you use the command "module load power/power_tools" loads the 
+last version of the tools: module load power/power-tools.
+
+Power Average:
 -Power_average applies the median or mean filter for the power data.
 The tool calculates for the values p from the files channel_X_*.dat the new
 values:
@@ -101,7 +105,7 @@ user@fe~:power_average -prefixchannel Channel -extension dat -channel_id 1\
 ./3223.fe.excess-project.eu -window_step_left 1 - window_step_right 1\
 -operation median -out_prefixchannel node01 _channel -verbosity 0 
 
-===================Power calculate=====================
+Power calculate:
 This tool helps to calculate a power consumption of various components for
 a certain period of time.
 The periods or phases of the application can be defined in the arguments of
