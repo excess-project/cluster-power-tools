@@ -26,20 +26,20 @@ High Performance Computing Center Stuttgart (HLRS)
  or FITNESS FOR A PARTICULAR PURPOSE.
 =======================================================
 The power measurement system is a linux server equiped
-with one or several A/D converters in the form a PCIe 
-card ACPIe-3021 of the company ADDI-DATA GmbH.
-The document ./datenblatt_apcie-3021.pdf contains
-the description of the card. To use other A/D converters,
+with one or several A/D converters in the form of a PCIe 
+card. In our system we use four cards ACPIe-3021 of the
+company ADDI-DATA GmbH. The document ./datenblatt_apcie-3021.pdf
+contains a description of the card. To use other A/D converters,
 the drivers (see ../driver/Readme.txt) must be extended
-with the new functionality.
+with the new functionality to control the cards in compatible way.
 The document power_sensors.pdf contains a description and
 electric schema for the additional devices, which must
 be connected to the input channels of A/D converters.
 The power tools are tested with four A/D converters in
-on server. The system can be expanded with at least two
+one server. The system can be expanded with at least two
 more cards.
 You can order the server by the company or build you own.
-We the following key points of the server configuration
+We advise the following configuration of the server
 for 1-6 cards:
 -Use desktop processor with 4 cores  
  (for example Intel(R) Core(TM) i5-3570 CPU). 
@@ -49,8 +49,8 @@ for 1-6 cards:
  We use WDC WD1000DHTZ 
 -SSD disk for the output of hpc_measure
  We use Samsung SSD 840 EVO 250GB
--Use Expansion Backplane PCIe if you want to install several 
- ACPIE-3021 cards
+-Use PCIe Expansion Backplane if you want to install several 
+ more ACPIE-3021 cards than avalaible PCIe slots on a mother board.
 
 
 ========================================================
