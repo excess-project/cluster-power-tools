@@ -45,7 +45,6 @@ number  262144  defines   the  number of  pages  in the
 memory,  which  will  be  used  by  the  A/D converters
 APCIe-3021 to save the measure values using DMA.
 
-
 After the installation of the operating system, install
 the packages, which are listed in the file 
 "installed-software.log", even if a major part of the
