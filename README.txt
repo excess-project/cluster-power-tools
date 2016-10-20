@@ -25,7 +25,8 @@ See ./power-measurement-system/Readme.txt for the details.
 ======================================================
 Authors: 
 Dmitry Khabi (HLRS) and
-Björn Dick (HLRS)
+Björn Dick (HLRS) and
+Uwe Küster (HLRS)
 
 High Performance Computing Center Stuttgart (HLRS)
 University of Stuttgart
