@@ -9,7 +9,7 @@ SRC_DIR=./
 OBJ_DIR=./obj
 LIB_DIR = ./lib
 LIB_DIR_NAME=libhpcpower.a
-CFLAGS = -lini_config -lpthread -lcurl  
+LIBS = -lini_config -lpthread -lcurl  
 #-D__DO_INFO_SYSLOG_	 -D__DO_DEBUG_SYSLOG_	
 #-D__DO_INFO_SYSLOG_	 -D__DO_DEBUG_SYSLOG_	
 
@@ -39,21 +39,21 @@ OBJECTS=$(foreach file,$(SOURCE_NAMES),$(OBJ_DIR)/$(basename $(file)).o)
 # 
 #
 hpc_measure: hpc_measure.c findboards.c errormsg.c input.c hpc_signals.c hpc_config.c hpc_jitter.c hpc_threads.c
-	$(CC) -O2  -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@
+	$(CC) -O2  -Wall -I./ -I$(ADDIDATAINC) $^ -o $@ $(LIBS) 
 	
 hpc_convert: hpc_convert.c hpc_mf.c hpc_timespec.c hpc_signals.c hpc_statistic.c hpc_config.c  hpc_curl.c
-	$(CC) -O2 -g  -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@  -lm
+	$(CC) -O2 -g  -Wall -I./ -I$(ADDIDATAINC)  $^ -o $@  -lm $(LIBS) 
 
 hpc_convert_ac: hpc_convert_ac.c hpc_timespec.c hpc_signals.c hpc_statistic.c hpc_mf.c hpc_config.c hpc_curl.c
-	$(CC) -O2  -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@  -lm
+	$(CC) -O2  -Wall -I./ -I$(ADDIDATAINC) $^ -o $@  -lm $(LIBS) 
 
 hpc_update: hpc_update.c errormsg.c
-	$(CC) -D__DO_INFO_SYSLOG_ -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@	
+	$(CC) -D__DO_INFO_SYSLOG_ -Wall -I./ -I$(ADDIDATAINC)  $^ -o $@	$(LIBS) 
 
 
 #Erzeugung von Objectdateien
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC_LIB) -O2  -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS)  -c $< -o $@
+	$(CC_LIB) -O2  -Wall -I./ -I$(ADDIDATAINC)  -c $< -o $@ $(LIBS) 
 
 hpc_power_lib:  $(OBJECTS) 
 	ar rcs $(LIB_DIR)/$(LIB_DIR_NAME) $(OBJECTS)
