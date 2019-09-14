@@ -227,6 +227,25 @@ int hpc_read_power_config_file (const char * config_file, struct iniPowerConfig_
              config_components[component].coeff2 = doubleval;
              loginfo_debug ("coeff2\t= %lf", doubleval);
 
+             sprintf (name, "shunt_ohm");
+
+			 ret = get_config_item (section, name, ini_config, &item);
+			 if (ret)
+			 {
+			 	loginfo_error ("get_config_item [COMPONENT_%i] shunt_ohm, error %i (%s)", component, ret, parsing_error_str (ret));
+				goto error;
+			 }
+
+			 doubleval = get_double_config_value (item, 0, 0, &ret);
+			 if (ret)
+			 {
+			 	loginfo_error ("get_double_config_value [COMPONENT_%i] shunt_ohm, error %i (%s)", component, ret, parsing_error_str (ret));
+			 	goto error;
+			 }
+             config_components[component].shunt_ohm = doubleval;
+             loginfo_debug ("shunt_ohm\t= %lf", doubleval);
+
+
 			}
 		   }
          }

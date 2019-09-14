@@ -32,6 +32,7 @@ type, bind(c) :: components_t
   integer(kind=c_ik)                   :: voltage_board_id
   real(kind=c_rdk)                     :: coeff1
   real(kind=c_rdk)                     :: coeff2
+  real(kind=c_rdk)                     :: shunt_ohm
   character(kind=c_char), dimension(64) :: label
 end type components_t
 

@@ -41,7 +41,7 @@ struct board_t
 	uint32_t is_on[8];
 	float coeff1[8];
 	float coeff2[8];
-    char label[8][64];
+        char label[8][64];
 };
 
 //---------------------------------------------------------------------------------------
@@ -96,6 +96,7 @@ struct components_t
     uint32_t voltage_board_id;
     float coeff1;
     float coeff2;
+    float shunt_ohm;
     char label[64];
 };
 //---------------------------------------------------------------------------------------

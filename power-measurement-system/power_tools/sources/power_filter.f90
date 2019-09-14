@@ -29,7 +29,6 @@ use power_operations
 implicit none
   type(power_input_parameter_type)                   :: input_parameters !user input
   integer(kind=ik)                                   :: err_code
-  type(power_timestep_type),allocatable,dimension(:) :: timesteps
   type(power_rawdata_type)                           :: channel_rawdata
   type(power_rawdata_type)                           :: channel_av_rawdata
   real(kind=rk)                                      :: average

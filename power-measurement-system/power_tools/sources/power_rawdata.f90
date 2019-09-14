@@ -67,7 +67,7 @@ subroutine power_power_rawdata_file_read(power_rawdata,input_parameters,err_code
  type(power_input_parameter_type)                            :: input_parameters
  integer(kind=ik),intent(out)                                :: err_code
  integer(kind=ik) :: unit_nr, record_length, file_size
- integer(kind=ik) :: ii, rawdata_num, rawdata_seq_num
+ integer(kind=ik) :: rawdata_num, rawdata_seq_num
  character(len=str_length)    :: filepath_channel
  integer(kind=ik) :: start_record, end_record
  unit_nr = 1010_ik

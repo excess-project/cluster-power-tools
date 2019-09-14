@@ -39,13 +39,13 @@ OBJECTS=$(foreach file,$(SOURCE_NAMES),$(OBJ_DIR)/$(basename $(file)).o)
 # 
 #
 hpc_measure: hpc_measure.c findboards.c errormsg.c input.c hpc_signals.c hpc_config.c hpc_jitter.c hpc_threads.c
-	$(CC) -O2  -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@
+	$(CC) -O2 -g  -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@
 	
 hpc_convert: hpc_convert.c hpc_mf.c hpc_timespec.c hpc_signals.c hpc_statistic.c hpc_config.c  hpc_curl.c
-	$(CC) -O2 -g  -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@  -lm
+	$(CC) -D__DO_INFO_SYSLOG_ -O0 -g  -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@  -lm
 
 hpc_convert_ac: hpc_convert_ac.c hpc_timespec.c hpc_signals.c hpc_statistic.c hpc_mf.c hpc_config.c hpc_curl.c
-	$(CC) -O2  -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@  -lm
+	$(CC) -O2 -g  -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@  -lm
 
 hpc_update: hpc_update.c errormsg.c
 	$(CC) -D__DO_INFO_SYSLOG_ -Wall -I./ -I$(ADDIDATAINC) $(CFLAGS) $^ -o $@	

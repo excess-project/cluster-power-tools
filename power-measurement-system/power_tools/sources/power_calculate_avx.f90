@@ -83,7 +83,8 @@ implicit none
   type(length_type)                                :: length
   type(performance_type)                           :: performance
   integer(kind=ik)                                 :: num_lines
-
+  
+  energy_tmp = 0.0_rk
   write_out = .false._lk
   call power_input_parameter_read(input_parameters,err_code)!read user input parameters from command line
   if (input_parameters%verbosity) then

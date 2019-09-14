@@ -15,7 +15,7 @@ subroutine power_statistic_median_value(step_left, step_right, values, indexes, 
  integer(kind=ik),allocatable, dimension(:) ,intent(inout)    :: indexes
  real(kind=rdk), intent(out)                                :: median_value
  integer(kind=ik),intent(out)                              :: err_code
- integer(kind=ik)                              :: ii,jj,idx1,idx2, length
+ integer(kind=ik)                              :: jj,idx1,idx2, length
  logical :: swapped
  
  err_code = 0_ik;
@@ -43,7 +43,6 @@ subroutine power_statistic_rawdata_filter_median(power_average_rawdata,power_raw
   type(power_input_parameter_type), intent(in)               :: input_parameter
   integer(kind=ik),intent(out)                               :: err_code
   integer(kind=ik) :: rawdata_length, ii, jj, step_left,step_right,kk
-  integer(kind=ik) :: offset_idx
   real(kind=rdk) :: median_value
   real(kind=rdk),allocatable, dimension(:) :: temp_array
   integer(kind=ik),allocatable, dimension(:) :: temp_array_idx
@@ -199,7 +198,7 @@ subroutine power_statistic_rawdata_filter_eq(power_eq_rawdata,power_rawdata,inpu
   type(power_rawdata_type), intent(in)                       :: power_rawdata
   type(power_input_parameter_type), intent(in)               :: input_parameter
   integer(kind=ik),intent(out)                               :: err_code
-  integer(kind=ik) :: rawdata_length, ii, jj
+  integer(kind=ik) :: rawdata_length
   err_code = 0_ik
   rawdata_length = size(power_rawdata%rawdata)
   allocate(power_eq_rawdata%rawdata(rawdata_length))

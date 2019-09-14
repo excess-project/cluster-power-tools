@@ -35,6 +35,7 @@ struct components_t
 	int voltage_board_id;
 	float coeff1;
 	float coeff2;
+	float shunt_ohm;
     char label[64];
 };
 //---------------------------------------------------------------------------------------

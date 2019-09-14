@@ -45,6 +45,7 @@ type power_input_parameter_type
   real(kind=rk)                 :: offset_nanosec
   logical(kind=lk)              :: relative_time
   logical(kind=lk)              :: with_profile_file
+  logical(kind=lk)              :: apply_shunt_correction ! Pout = Pmeasure - I^2*Rshunt
   character(len=str_length)     :: performance_file !input file
   character(len=str_length)     :: power_file      !output file for power
   character(len=str_length)     :: energy_file      !output file for energy
@@ -77,6 +78,7 @@ type(power_input_parameter_type),intent(in) :: input_parameters
   write(power_output_unit,*)"profile_topdir:",trim(input_parameters%profile_topdir)
   write(power_output_unit,*)"profile_file:",trim(input_parameters%profile_file)
   write(power_output_unit,*)"with_profile_file:",input_parameters%with_profile_file
+  write(power_output_unit,*)"apply_shunt_correction:",input_parameters%apply_shunt_correction
   write(power_output_unit,*)"alpha_min:",input_parameters%alpha_min
   write(power_output_unit,*)"alpha_max:",input_parameters%alpha_max
   write(power_output_unit,*)"alpha_step:",input_parameters%alpha_step
@@ -144,6 +146,7 @@ type(power_input_parameter_type),intent(inout) :: input_parameters
   input_parameters%offset_microsec=0.0_rk
   input_parameters%offset_nanosec=0.0_rk
   input_parameters%with_profile_file=.false._lk
+  input_parameters%apply_shunt_correction = .false._lk
   input_parameters%relative_time=.false._lk
 
   write(input_parameters%performance_file,'(A)') "unknown.dat"
@@ -165,8 +168,8 @@ end subroutine power_input_parameter_check
 subroutine power_input_parameter_read(input_parameters, err_code)
   type(power_input_parameter_type),intent(out) :: input_parameters
   integer(kind=ik),intent(out)                 :: err_code
-  character(len=2048) :: cmd
-  character(len=2048) :: message
+  character(len=4096) :: cmd
+  character(len=4096) :: message
   character(len=256) :: config_file
   integer(kind=ik) :: help
   integer(kind=ik) :: int_temp
@@ -210,6 +213,7 @@ subroutine power_input_parameter_read(input_parameters, err_code)
       &//' -offset_microsec<real>' &
       &//' -offset_nanosec<real>' &
       &//' -with_profile_file<int>'&
+      &//' -apply_shunt_correction<int>'&
       &//' -profile_topdir<string>' &
       &//' -profile_file<string>' &
       &//' -out_filename<string>' &
@@ -379,13 +383,23 @@ subroutine power_input_parameter_read(input_parameters, err_code)
                 syntax=message) /=0) then
   endif
 
-int_temp = 0_ik
+  int_temp = 0_ik
   if(power_extract_command_parameter(cmd,'-with_profile_file',stop_on_error=.false.,&
                 value=int_temp,syntax=message) /=0) then
   endif
+
   if(int_temp .gt. 0_ik) then
     input_parameters%with_profile_file = .true._lk
   end if
+
+  int_temp = 0_ik
+  if(power_extract_command_parameter(cmd,'-apply_shunt_correction',stop_on_error=.false.,&
+                value=int_temp,syntax=message) /=0) then
+  endif
+  if(int_temp .gt. 0_ik) then
+    input_parameters%apply_shunt_correction = .true._lk
+  end if
+
   input_parameters%config_file=trim(config_file)//char(0)
   if(input_parameters%verbosity_level .GT. 0_ik) input_parameters%verbosity = .TRUE._lk
   

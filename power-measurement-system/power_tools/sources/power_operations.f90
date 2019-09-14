@@ -55,7 +55,7 @@ subroutine power_operation_find_min_alpha(alpha, norm_2, power_data,power_data1,
   type(power_input_parameter_type), intent(in)               :: input_parameter
   integer(kind=ik),intent(out)                               :: err_code
   integer(kind=ik) :: rawdata_length, ii, num_tests
-  real(kind=rdk) :: norm2_data1, norm2_data2
+  real(kind=rk) :: norm2_data1, norm2_data2
   real(kind=rk) :: current_aplha
   real(kind=rk), allocatable, dimension(:) :: norm2_difference
   integer(kind=ik),  dimension(1) :: min_index

@@ -6,12 +6,12 @@
 #We use this library to read the config
 #file, which also used by hpc_converter
 #See ../driver/Readme.txt about hpc_converter
-LIB_HPCPOWER_PATH=/opt/power/power_tools/25/lib/
+LIB_HPCPOWER_PATH=/opt/power/power_tools/26/lib/
 #Compiler-Auswahl
 #GNU compiler
 F90=gfortran
 # -fbounds-check
-FFLAGS=-O2 -g -Wall -ffast-math -fstrict-aliasing -funroll-loops -Warray-bounds  -fbounds-check
+FFLAGS=-O2 -mavx -g -Wall -ffast-math -fstrict-aliasing -funroll-loops -Warray-bounds  -fbounds-check
 #  LFLAGS=-O0 -g -Wall -ffast-math -fstrict-aliasing -funroll-loops
 #  FFLAGS += -J./$(MOD_DIR)
 
@@ -53,7 +53,7 @@ EXEC_OBJECTS_2=$(foreach file,$(EXEC_SOURCE_NAMES_2),$(OBJ_DIR)/$(basename $(fil
 EXEC_OBJECTS_3=$(foreach file,$(EXEC_SOURCE_NAMES_3),$(OBJ_DIR)/$(basename $(file)).o)
 EXEC_OBJECTS_4=$(foreach file,$(EXEC_SOURCE_NAMES_4),$(OBJ_DIR)/$(basename $(file)).o)
 
-all: dirs $(EXEC_NAME) $(EXEC_NAME_2) $(EXEC_NAME_3) $(EXEC_NAME_4)
+all: dirs $(EXEC_NAME) $(EXEC_NAME_2) $(EXEC_NAME_4)
 
 #Erstellung von Verzecihnissen für Object- und Moddateien
 dirs:

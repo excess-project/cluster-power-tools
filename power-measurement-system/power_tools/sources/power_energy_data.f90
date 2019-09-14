@@ -130,8 +130,8 @@ subroutine power_energy_print(power_energy)
       (power_energy%energy_by_phases(ii)%phase_end), " sec"
     write(power_output_unit,'(A,E13.6,A)') "phase_duration:",&
       (power_energy%energy_by_phases(ii)%phase_duration), " sec"
-    write(power_output_unit,'(A,E13.6,A)') "phase_num_measures:",&
-      real(power_energy%energy_by_phases(ii)%phase_num_measures,kind=rk), ""
+    write(power_output_unit,'(A,E13.6)') "phase_num_measures:",&
+      real(power_energy%energy_by_phases(ii)%phase_num_measures,kind=rk)
     do jj=1,num_components
       write(power_output_unit,'(A,A,A)') char(9)//"==component:",&
        trim(power_energy%energy_by_phases(ii)%energy_by_components(jj)%component_label),&
@@ -206,7 +206,7 @@ subroutine power_energy_write(power_energy,input_parameters)
          trim(power_energy%energy_by_phases(1_ik)%energy_by_components(jj)%component_label),&
          trim("_Joule"),trim(";")
       end do
-      write(unit,'(A)',advance='yes') ,""
+      write(unit,'(A)',advance='yes') " "
     end if
     num_phases = size(power_energy%energy_by_phases)
     do ii=1_ik,num_phases
@@ -229,7 +229,7 @@ subroutine power_energy_write(power_energy,input_parameters)
         write(unit,'(E13.6,A)',advance='no') &
           power_energy%energy_by_phases(ii)%energy_by_components(jj)%max_energy_joule,";"
       end do
-      write(unit,'(A)',advance='yes') ,""
+      write(unit,'(A)',advance='yes') " "
     end do
     close(unit)
   end if
@@ -239,7 +239,7 @@ end subroutine power_energy_write
 subroutine power_energy_idx_write(power_energy,input_parameters)
   type(power_energy_type),intent(in)            :: power_energy
   type(power_input_parameter_type),intent(in)   :: input_parameters !user input
-  integer(kind=ik) :: ii, jj, num_phases, num_components
+  integer(kind=ik) :: ii, num_phases, num_components
   character(len=str_length) :: filename
   logical(kind=lk) :: show_header
   integer :: unit,iostat
@@ -272,7 +272,7 @@ subroutine power_energy_idx_write(power_energy,input_parameters)
       write(unit,'(A,A,A)',advance='no') trim("end_volt_"),trim("idx"),trim(";")
       write(unit,'(A,A,A)',advance='no') trim("start_current_"),trim("idx"),trim(";")
       write(unit,'(A,A,A)',advance='no') trim("end_current_"),trim("idx"),trim(";")
-      write(unit,'(A)',advance='yes') ,""
+      write(unit,'(A)',advance='yes') " "
     end if
     num_phases = size(power_energy%energy_by_phases)
     do ii=1_ik,num_phases
@@ -289,7 +289,7 @@ subroutine power_energy_idx_write(power_energy,input_parameters)
           power_energy%energy_by_phases(ii)%current_start_indx,";"
       write(unit,'(I10,A)',advance='no') &
           power_energy%energy_by_phases(ii)%current_end_indx,";"
-      write(unit,'(A)',advance='yes') ,""
+      write(unit,'(A)',advance='yes') " "
     end do
     close(unit)
   end if

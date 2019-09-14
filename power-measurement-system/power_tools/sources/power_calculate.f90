@@ -1,5 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Copyright (C) 2014-2015 University of Stuttgart
+! Copyright (C) 2014-2019 University of Stuttgart
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -74,8 +74,8 @@ implicit none
   integer(kind=ik)                                   :: num_phases
   type(power_energy_type)                            :: energy
   real(kind=rk)                                      :: energy_tmp
-  real(kind=rk)                                      :: tmp_value
-  real(kind=rk)                                      :: min_energy_tmp, max_energy_tmp
+  real(kind=rk)                                      :: tmp_value, tmp_value2
+  real(kind=rk)                                      :: min_power_tmp, max_power_tmp
   real(kind=rk)                                      :: energy_by_average_tmp
   real(kind=rk)                                      :: coeff1_tmp
   real(kind=rk)                                      :: coeff2_tmp
@@ -86,8 +86,13 @@ implicit none
   type(profile_type)                                 :: profiles
   logical(kind=lk)                                   :: one_channel
   integer(kind=ik)                                   :: win_left, win_right
+  real(kind=rk)                                      :: corr_shunt_ohm
+
   write_out = .false._lk
   one_channel = .false._lk
+  energy_tmp = 0.0_rk
+  max_power_tmp = 0.0_rk
+  min_power_tmp = HUGE(0.0_rk)
   call power_input_parameter_read(input_parameters,err_code)!read user input parameters from command line
   if (input_parameters%verbosity) then
     call power_input_parameter_print(input_parameters)!print user input parameters from command line
@@ -270,8 +275,13 @@ implicit none
     current_num_measures = size(current_channel_rawdata%rawdata)
     volt_num_measures = size(volt_channel_rawdata%rawdata)
     
-
-
+    if (input_parameters%apply_shunt_correction) then
+      corr_shunt_ohm = components(ii)%shunt_ohm
+    else
+      corr_shunt_ohm = 0.0_rk
+    endif
+    coeff1_tmp = components(ii)%coeff1
+    coeff2_tmp = components(ii)%coeff2
     do jj=1_ik,num_phases
     
       phase_start_sec=profiles%start_sec(jj)
@@ -337,8 +347,6 @@ implicit none
             volt_start_indx,"-",volt_end_indx
       end if  
       !calculate power consumption from voltage and current data during the jj-th phase
-      coeff1_tmp = components(ii)%coeff1
-      coeff2_tmp = components(ii)%coeff2
       if(volt_start_indx .eq. current_start_indx .and. &
         current_end_indx .eq. volt_end_indx) then
         energy_tmp=0.0
@@ -348,34 +356,39 @@ implicit none
              "; volt_indx:",&
             volt_start_indx,"-",volt_end_indx
         end if
-        max_energy_tmp = 0.0_rk
-        min_energy_tmp = HUGE(0.0_rk)
+        max_power_tmp = 0.0_rk
+        min_power_tmp = HUGE(0.0_rk)
         if(one_channel)then
           do kk=volt_start_indx, volt_end_indx
-            tmp_value = current_channel_rawdata%rawdata(kk)
-            if(max_energy_tmp .lt. tmp_value) then
-              max_energy_tmp = tmp_value
+            tmp_value2 = current_channel_rawdata%rawdata(kk)
+            tmp_value = coeff1_tmp*tmp_value2 - tmp_value2*tmp_value2*corr_shunt_ohm
+            if(max_power_tmp .lt. tmp_value) then
+              max_power_tmp = tmp_value
             end if
-            if(min_energy_tmp .gt. tmp_value) then
-              min_energy_tmp = tmp_value
+            if(min_power_tmp .gt. tmp_value) then
+              min_power_tmp = tmp_value
             end if
             energy_tmp = energy_tmp + &
             (current_channel_rawdata%rawdata(kk))
           end do
+          energy_tmp = energy_tmp / real(((volt_end_indx-volt_start_indx)+1_ik),kind=rk)
+          energy_tmp= energy_tmp+coeff2_tmp
         else
           do kk=volt_start_indx, volt_end_indx
-            tmp_value = current_channel_rawdata%rawdata(kk)*volt_channel_rawdata%rawdata(kk)
-            if(max_energy_tmp .lt. tmp_value) then
-              max_energy_tmp = tmp_value
+            tmp_value2 = current_channel_rawdata%rawdata(kk)
+            tmp_value = tmp_value2*volt_channel_rawdata%rawdata(kk)
+            tmp_value = tmp_value - tmp_value2*tmp_value2*corr_shunt_ohm
+            if(max_power_tmp .lt. tmp_value) then
+              max_power_tmp = tmp_value
             end if
-            if(min_energy_tmp .gt. tmp_value) then
-              min_energy_tmp = tmp_value
+            if(min_power_tmp .gt. tmp_value) then
+              min_power_tmp = tmp_value
             end if
             energy_tmp = energy_tmp + tmp_value
           end do
+          energy_tmp = energy_tmp / real(((volt_end_indx-volt_start_indx)+1_ik),kind=rk)
+          energy_tmp= energy_tmp*coeff1_tmp+coeff2_tmp
         end if
-        energy_tmp = energy_tmp / real(((volt_end_indx-volt_start_indx)+1_ik),kind=rk)
-        energy_tmp= energy_tmp*coeff1_tmp+coeff2_tmp
       end if
       current_average_tmp = 0.0_rk
       volt_average_tmp = 0.0_rk
@@ -390,9 +403,11 @@ implicit none
       end do
       volt_average_tmp = volt_average_tmp / real(((volt_end_indx-volt_start_indx)+1_ik),kind=rk)
       if(one_channel)then
-        energy_by_average_tmp= coeff1_tmp*(current_average_tmp)+coeff2_tmp
+        energy_by_average_tmp= coeff1_tmp*(current_average_tmp)+coeff2_tmp-&
+                &current_average_tmp*current_average_tmp*corr_shunt_ohm
       else
-        energy_by_average_tmp= coeff1_tmp*(volt_average_tmp*current_average_tmp)+coeff2_tmp
+        energy_by_average_tmp= coeff1_tmp*(volt_average_tmp*current_average_tmp)+coeff2_tmp-&
+                &current_average_tmp*current_average_tmp*corr_shunt_ohm
       end if
       !if(jj .eq. 1_ik) then
         write(energy%energy_by_phases(jj)%phase_label,'(A,I0)')trim("phase:"),profiles%id(jj)
@@ -412,15 +427,15 @@ implicit none
       energy%energy_by_phases(jj)%energy_by_components(ii)%component_label=&
         c_to_f_string(components(ii)%label)
       energy%energy_by_phases(jj)%energy_by_components(ii)%power_watt=energy_tmp
-      energy%energy_by_phases(jj)%energy_by_components(ii)%max_power_watt=max_energy_tmp
-      energy%energy_by_phases(jj)%energy_by_components(ii)%min_power_watt=min_energy_tmp
+      energy%energy_by_phases(jj)%energy_by_components(ii)%max_power_watt=max_power_tmp
+      energy%energy_by_phases(jj)%energy_by_components(ii)%min_power_watt=min_power_tmp
       energy%energy_by_phases(jj)%energy_by_components(ii)%power_by_average_watt=energy_by_average_tmp
       energy%energy_by_phases(jj)%energy_by_components(ii)%energy_joule=&
         energy_tmp*(phase_end_sec-phase_start_sec)
       energy%energy_by_phases(jj)%energy_by_components(ii)%max_energy_joule=&
-        max_energy_tmp*(phase_end_sec-phase_start_sec)
+        max_power_tmp*(phase_end_sec-phase_start_sec)
       energy%energy_by_phases(jj)%energy_by_components(ii)%min_energy_joule=&
-        min_energy_tmp*(phase_end_sec-phase_start_sec)
+        min_power_tmp*(phase_end_sec-phase_start_sec)
       energy%energy_by_phases(jj)%energy_by_components(ii)%energy_by_average_joule=&
         energy_by_average_tmp*(phase_end_sec-phase_start_sec)
   end do

@@ -314,6 +314,11 @@ int main (int argc, char** argv)
     CURL *curl_ =NULL;
     int stop_local;
     int save_to_disk=0;
+    char compute_node[256];
+    char username[256];
+    char jobname[256];
+    int param_t;
+
     filter_step_left=10;
     filter_step_right=10;
 
@@ -327,11 +332,15 @@ int main (int argc, char** argv)
     print_options_help();
     return EXIT_FAILURE;
     } 
-    while ((opt = (char) (getopt(argc, argv, "r:c:d:b:f:s:h:?"))) != -1) {
+    while ((opt = (char) (getopt(argc, argv, "r:c:d:b:f:s:h:t:u:p:n:?"))) != -1) {
     switch (opt) {
        case 'c': sprintf(config_file, "%s", optarg);break;
        case 'r': sprintf(directory_path, "%s", optarg);break;
+       case 'p': sprintf(compute_node, "%s", optarg);break;
+       case 'u': sprintf(username, "%s", optarg);break;
+       case 'n': sprintf(jobname, "%s", optarg);break;
        case 'd': sprintf(dbkey,"%s", optarg);break;
+       case 't': param_t = atoi(optarg);break;
        case 'b': filter_step_left = atoi(optarg);break;
        case 'f': filter_step_right = atoi(optarg);break;
        case 's': save_to_disk = atoi(optarg);break;
