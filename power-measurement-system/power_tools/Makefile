@@ -6,7 +6,7 @@
 #We use this library to read the config
 #file, which also used by hpc_converter
 #See ../driver/Readme.txt about hpc_converter
-LIB_HPCPOWER_PATH=/opt/power/power_tools/26/lib/
+LIB_HPCPOWER_PATH=../../power-measurement-system/driver/100483_HLRS_APCIe-3021_48Kanal_Sientific_Linux64Bit/hpcus/hpc/lib
 #Compiler-Auswahl
 #GNU compiler
 F90=gfortran
@@ -69,10 +69,10 @@ $(EXEC_NAME): $(F90_OBJECTS) $(EXEC_OBJECTS)
 	$(F90) $(LFLAGS) -J$(MOD_DIR) -I$(MOD_DIR) -o  $(EXEC_NAME) $(F90_OBJECTS) $(EXEC_OBJECTS) 
 
 $(EXEC_NAME_2): $(F90_OBJECTS_2) $(EXEC_OBJECTS_2)
-	$(F90) $(LFLAGS) -J$(MOD_DIR) -I$(MOD_DIR) -o  $(EXEC_NAME_2) $(F90_OBJECTS_2) $(EXEC_OBJECTS_2) -lini_config -lcurl ${LIB_HPCPOWER_PATH}/libhpcpower.a
+	$(F90) $(LFLAGS) -J$(MOD_DIR) -I$(MOD_DIR) -o  $(EXEC_NAME_2) $(F90_OBJECTS_2) $(EXEC_OBJECTS_2) ${LIB_HPCPOWER_PATH}/libhpcpower.a -lini_config -lcurl 
 
 $(EXEC_NAME_3): $(F90_OBJECTS_3) $(EXEC_OBJECTS_3)
-	$(F90) $(LFLAGS) -J$(MOD_DIR) -I$(MOD_DIR) -o  $(EXEC_NAME_3) $(F90_OBJECTS_3) $(EXEC_OBJECTS_3) -lini_config -lcurl ${LIB_HPCPOWER_PATH}/libhpcpower.a
+	$(F90) $(LFLAGS) -J$(MOD_DIR) -I$(MOD_DIR) -o  $(EXEC_NAME_3) $(F90_OBJECTS_3) $(EXEC_OBJECTS_3) ${LIB_HPCPOWER_PATH}/libhpcpower.a -lini_config -lcurl 
 
 $(EXEC_NAME_4): $(F90_OBJECTS_4) $(EXEC_OBJECTS_4)
 	$(F90) $(LFLAGS) -J$(MOD_DIR) -I$(MOD_DIR) -o  $(EXEC_NAME_4) $(F90_OBJECTS_4) $(EXEC_OBJECTS_4) 
