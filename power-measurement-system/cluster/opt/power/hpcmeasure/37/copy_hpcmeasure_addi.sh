@@ -51,7 +51,7 @@ rm ${PROC_CONVERT_PIDFILE} -rf
 #echo $DATE":PROC_MEASURE_PIDFILE:"$PROC_MEASURE_PIDFILE  >>$LOG_FILE
 #echo $DATE":PROC_CONVERT_PIDFILE:"$PROC_CONVERT_PIDFILE  >>$LOG_FILE
 #echo $DATE":LOG_FILE:"$LOG_FILE  >>$LOG_FILE
-
+echo $DATE":PBS_JOBID:"$PBS_JOBID"; PBS_USER:"${PBS_USER} "; START:" >>$LOG_FILE
 if [ -z "$PBS_JOBID" ]; then
   echo $DATE":Error in copy_hpcmeasure_addi.sh: variable PBS_JOBID is not initialized" >> $LOG_FILE
   exit 1
@@ -86,7 +86,28 @@ done
 mv ${POWER_FILE_PATH}/* ${PWM_TMP_JOB_PATH}/
 chown power:ws ${PWM_TMP_JOB_PATH}/* -R
 chmod ug+rwx ${PWM_TMP_JOB_PATH}/*
-tar -czf ${PWM_ARCH_PATH}/${PWM_ARCH} -C ${PWM_TMP_PATH} ./${PBS_JOBID}
+start=$(date +%s.%N)
+tar --use-compress-program="pigz"  -cf ${PWM_ARCH_PATH}/${PWM_ARCH} -C ${PWM_TMP_PATH} ./${PBS_JOBID}  &>>${LOG_FILE}
+#tar -czf ${PWM_ARCH_PATH}/${PWM_ARCH} -C ${PWM_TMP_PATH} ./${PBS_JOBID}  &>>${LOG_FILE}
+duration=$(echo "$(date +%s.%N) - $start" | bc)
+echo "TAR execution time: " ${duration} " seconds" >>${LOG_FILE}
+start_du=$(date +%s.%N)
+dir_du_size=$(du -sb ${PWM_TMP_JOB_PATH})
+duration_du=$(echo "$(date +%s.%N) - $start_du" | bc)
+echo "DU time: " ${duration_du} " seconds;" >>${LOG_FILE}
+#ls ${PWM_TMP_JOB_PATH} -lrt  >>${LOG_FILE}
+dir_size=$(echo ${dir_du_size}| awk '{ print $1 }')
+dir_size_kb=$(echo "scale=6; ${dir_size}/1024" |bc)
+dir_size_mb=$(echo "scale=6; ${dir_size}/1048576" |bc)
+dir_size_gb=$(echo "scale=6; ${dir_size}/1073741824" |bc)
+arch_size=$(stat -c %s ${PWM_ARCH_PATH}/${PWM_ARCH})
+arch_size_kb=$(echo "scale=6; ${arch_size}/1024" |bc)
+arch_size_mb=$(echo "scale=6; ${arch_size}/1048576" |bc)
+arch_size_gb=$(echo "scale=6; ${arch_size}/1073741824" |bc)
+compression_coeff=$(echo "scale=6; ${dir_size_mb}/${arch_size_mb}" |bc)
+echo "size of ${PWM_TMP_JOB_PATH}: " $dir_size "B; " $dir_size_kb "KB; " $dir_size_mb "MB; " ${dir_size_gb} "GB;" >> ${LOG_FILE}
+echo "size of ${PWM_ARCH_PATH}/${PWM_ARCH}: " $arch_size_kb "KB; " $arch_size_mb "MB; " ${arch_size_gb} "GB;" >> ${LOG_FILE}
+echo "compression coeff: "${compression_coeff}";"  >> ${LOG_FILE}
 chown power:ws ${PWM_ARCH_PATH}/${PWM_ARCH}
 #start transfer of archive 
 #echo $DATE":copy_hpcmeasure_addi.sh: copy the file ${PWM_ARCH_PATH}/${PWM_ARCH} to ${PWM_PATH}" >> $LOG_FILE
@@ -97,4 +118,4 @@ for ch_num in `seq 0 32`;do
  rm ${PWM_TMP_JOB_PATH}/Channel_${ch_num}_*.dat  &> /dev/null 
 done
 rm ${PWM_TMP_JOB_PATH} -rf
-
+echo $DATE":PBS_JOBID:"$PBS_JOBID " END" >>$LOG_FILE
