@@ -1,0 +1,37 @@
+#!/bin/sh
+
+#PBS -l nodes=1:node03:ppn=24
+#PBS -l walltime=01:00:00
+#PBS -q batch
+#PBS -M hpcdkhab@hlrs.de
+#PBS -N PARALLEL_STORM_ATOMIC
+#PBS -o /nas_home/hpcdkhab/myprojects/cluster-power-tools/power-measurement-system/benchmarks/messages/${PBS_JOBID}.out
+#PBS -e /nas_home/hpcdkhab/myprojects/cluster-power-tools/power-measurement-system/benchmarks/messages/${PBS_JOBID}.err
+
+PROJECT_DIR=/nas_home/hpcdkhab/myprojects/cluster-power-tools/power-measurement-system/benchmarks
+module load compiler/intel/parallel_studio_2017_update_4
+
+#:module load compiler/intel/parallel_studio_xe_2018_update1_cluster_edition
+set -x # Debug Modus ON
+LD_LIBRARY_PATH=/opt/power/power_tools/26/lib/:$LD_LIBRARY_PATH
+NUM_JOBID=$(cut -d '.'  -f 1 <<< "$PBS_JOBID") #Extract numerical part of a PBS_JOBID
+BENCH="DOT_ATOMIC"
+OUT_DIR="${PROJECT_DIR}/data/"
+NUM_REP=20
+NUM_MIN_CORES=1
+NUM_MAX_CORES=24
+MIN_FREQ=0
+MAX_FREQ=14
+MIN_VECTOR_LENGTH=1048576
+MAX_VECTOR_LENGTH=1048576
+VECTOR_LENGTH_MULT_STEP=2
+VERBOSITY=1 #Verbosity level 0 - silent mode
+
+if [ ! -d "$OUT_DIR" ]; then
+  mkdir $OUT_DIR -p
+fi
+
+echo "${PROJECT_DIR}/main  -j $NUM_JOBID  -t $BENCH -o $OUT_DIR -n $NUM_REP -e $NUM_MIN_CORES -b $NUM_MAX_CORES -r $MIN_FREQ -k $MAX_FREQ -l $MIN_VECTOR_LENGTH -x $MAX_VECTOR_LENGTH -s $VECTOR_LENGTH_MULT_STEP -v $VERBOSITY"
+${PROJECT_DIR}/main  -j $NUM_JOBID  -t $BENCH -o $OUT_DIR -n $NUM_REP -e $NUM_MIN_CORES -b $NUM_MAX_CORES -r $MIN_FREQ -k $MAX_FREQ -l $MIN_VECTOR_LENGTH -x $MAX_VECTOR_LENGTH -s $VECTOR_LENGTH_MULT_STEP -v $VERBOSITY
+set +x # Debug Modus OFF
+
