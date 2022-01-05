@@ -36,6 +36,8 @@ subroutine power_profile_new(length,profiles)
   profiles%start_nanosec(:) = 0.0_rtk
   profiles%end_sec(:) = 0.0_rtk
   profiles%end_nanosec(:) = 0.0_rtk
+  profiles%start_microsec(:) = 0.0_rk
+  profiles%end_microsec(:) = 0.0_rk
   
   profiles%num_profiles = 0_ik
 end subroutine  power_profile_new

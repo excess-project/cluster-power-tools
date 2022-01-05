@@ -11,7 +11,8 @@ LIB_HPCPOWER_PATH=../../power-measurement-system/driver/100483_HLRS_APCIe-3021_4
 #GNU compiler
 F90=gfortran
 # -fbounds-check
-FFLAGS=-O2 -mavx -g -Wall -ffast-math -fstrict-aliasing -funroll-loops -Warray-bounds  -fbounds-check
+#FFLAGS=-O2 -mavx -g -Wall -ffast-math -fstrict-aliasing -funroll-loops -Warray-bounds  -fbounds-check
+FFLAGS=-O2  -g -Wall -ffast-math -fstrict-aliasing -funroll-loops -Warray-bounds  -fbounds-check
 #  LFLAGS=-O0 -g -Wall -ffast-math -fstrict-aliasing -funroll-loops
 #  FFLAGS += -J./$(MOD_DIR)
 

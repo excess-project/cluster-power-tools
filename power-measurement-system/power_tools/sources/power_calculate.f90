@@ -45,10 +45,10 @@ implicit none
   type(components_t),dimension(100)                  :: components
   integer(kind=ik)                                   :: current_board_id
   integer(kind=ik)                                   :: volt_board_id
-  real(kind=rk)                                      :: phase_start_sec
+  real(kind=rk)                                      :: phase_start_sec, phase_start_sec_raw
   real(kind=rk)                                      :: phase_start_microsec
   real(kind=rk)                                      :: phase_start_nanosec
-  real(kind=rk)                                      :: phase_end_sec
+  real(kind=rk)                                      :: phase_end_sec, phase_end_sec_raw
   real(kind=rk)                                      :: phase_end_microsec
   real(kind=rk)                                      :: phase_end_nanosec
   real(kind=rk)                                      :: offset_sec
@@ -284,22 +284,28 @@ implicit none
     coeff2_tmp = components(ii)%coeff2
     do jj=1_ik,num_phases
     
-      phase_start_sec=profiles%start_sec(jj)
+      phase_start_sec_raw=profiles%start_sec(jj)
       phase_start_microsec=profiles%start_microsec(jj)
       phase_start_nanosec=profiles%start_nanosec(jj)
-      phase_end_sec=profiles%end_sec(jj)
+      phase_end_sec_raw=profiles%end_sec(jj)
       phase_end_microsec=profiles%end_microsec(jj)
       phase_end_nanosec=profiles%end_nanosec(jj)
       
-      phase_start_sec = phase_start_sec + phase_start_microsec*1.0e-6 + phase_start_nanosec*1.0e-9
-      phase_end_sec = phase_end_sec + phase_end_microsec*1.0e-6 + phase_end_nanosec*1.0e-9
+      phase_start_sec = phase_start_sec_raw + phase_start_microsec*1.0e-6 + phase_start_nanosec*1.0e-9
+      phase_end_sec = phase_end_sec_raw + phase_end_microsec*1.0e-6 + phase_end_nanosec*1.0e-9
       offset_sec = offset_sec + offset_microsec*1.0e-6 + offset_nanosec*1.0e-9    
     
       if(phase_start_sec .gt. phase_end_sec) then
-        write(power_output_unit,'(A,E13.6,A,E13.6)')  &
+        write(power_output_unit,'(A,E13.6,A,E13.6,A,I0)')  &
         "Error: The phase_start_time is later than phase_end_time: ",&
-        phase_start_sec, " > ", phase_end_sec
-             
+        phase_start_sec, " > ", phase_end_sec, "; index:", jj
+        write(power_output_unit,'(3(A,E13.6))') &
+        "phase_start_sec:",phase_start_sec_raw, &
+        "; phase_start_microsec:",phase_start_microsec, &
+        "; phase_start_nanosec:",phase_start_nanosec, &
+        "; phase_end_sec:",phase_end_sec_raw, &
+        "; phase_end_microsec:", phase_end_microsec, &
+        "; phase_end_nanosec:", phase_end_nanosec 
         stop
       end if
       volt_start_indx = 0
